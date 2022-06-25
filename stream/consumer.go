@@ -50,9 +50,7 @@ func (sr *SafeStreamHandler) StartHandling() <-chan error {
 				sr.outputErrCh <- fmt.Errorf("stream handler panicked: %v", r)
 			}
 
-			if err := sr.safeFinalize(); err != nil {
-				sr.outputErrCh <- err
-			}
+			sr.safeFinalize()
 
 		}()
 
@@ -81,7 +79,7 @@ func (sr *SafeStreamHandler) StartHandling() <-chan error {
 
 }
 
-func (sr *SafeStreamHandler) safeFinalize() error {
+func (sr *SafeStreamHandler) safeFinalize() {
 
 	defer func() {
 		if r := recover(); r != nil {
