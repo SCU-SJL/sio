@@ -9,3 +9,11 @@ func ToZipStreamData(sd StreamData) (ZipStreamData, error) {
 	}
 	return zd, nil
 }
+
+func ToMultipartStreamData(sd StreamData) (MultipartStreamData, error) {
+	hd, ok := sd.(MultipartStreamData)
+	if !ok {
+		return nil, errors.New("StreamData cannot be converted to MultipartStreamData")
+	}
+	return hd, nil
+}
