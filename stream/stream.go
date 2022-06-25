@@ -21,3 +21,35 @@ func NewDefaultStreamData(r io.ReadCloser) DefaultStreamData {
 func (d DefaultStreamData) GetReadCloser() io.ReadCloser {
 	return d.r
 }
+
+func CreateAsyncStream(dataList []StreamData) Stream {
+
+	stream := make(Stream)
+
+	go func() {
+
+		for _, data := range dataList {
+			stream <- data
+		}
+
+	}()
+
+	return stream
+
+}
+
+func CreateAsyncStreamWithReadCloser(rList []io.ReadCloser) Stream {
+
+	stream := make(Stream)
+
+	go func() {
+
+		for _, r := range rList {
+			stream <- NewDefaultStreamData(r)
+		}
+
+	}()
+
+	return stream
+
+}
