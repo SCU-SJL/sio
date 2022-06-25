@@ -8,19 +8,15 @@ type ZipStreamData interface {
 }
 
 type DefaultZipStreamData struct {
-	baseData DefaultStreamData
+	DefaultStreamData
 	filename string
 }
 
 func NewDefaultZipStreamData(r io.ReadCloser, filename string) ZipStreamData {
 	return DefaultZipStreamData{
-		baseData: NewDefaultStreamData(r),
-		filename: filename,
+		DefaultStreamData: NewDefaultStreamData(r),
+		filename:          filename,
 	}
-}
-
-func (d DefaultZipStreamData) GetReadCloser() io.ReadCloser {
-	return d.baseData.GetReadCloser()
 }
 
 func (d DefaultZipStreamData) GetFileName() string {
