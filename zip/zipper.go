@@ -8,12 +8,12 @@ import (
 )
 
 type Zipper struct {
-	handler *stream.SafeStreamHandler
+	handler *stream.SafeStreamConsumer
 	pr      *io.PipeReader
 	c       *streamDataConsumer
 }
 
-func NewZipper(inputStream stream.Stream, inputErrCh <-chan error) *Zipper {
+func NewZipper(inputStream *stream.Stream, inputErrCh <-chan error) *Zipper {
 
 	zipper := &Zipper{}
 
@@ -22,7 +22,7 @@ func NewZipper(inputStream stream.Stream, inputErrCh <-chan error) *Zipper {
 	zipper.pr = pr
 	zipper.c = newStreamDataConsumer(pw)
 
-	zipper.handler = stream.NewSafeStreamHandler(
+	zipper.handler = stream.NewSafeStreamConsumer(
 		inputStream,
 		inputErrCh,
 		zipper.c,

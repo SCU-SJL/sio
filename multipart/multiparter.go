@@ -8,12 +8,12 @@ import (
 )
 
 type Multiparter struct {
-	handler *stream.SafeStreamHandler
+	handler *stream.SafeStreamConsumer
 	pr      *io.PipeReader
 	c       *streamDataConsumerForMultipart
 }
 
-func NewMultiparter(inputStream stream.Stream, inputErrCh <-chan error) *Multiparter {
+func NewMultiparter(inputStream *stream.Stream, inputErrCh <-chan error) *Multiparter {
 
 	multiparter := &Multiparter{}
 
@@ -22,7 +22,7 @@ func NewMultiparter(inputStream stream.Stream, inputErrCh <-chan error) *Multipa
 	multiparter.pr = pr
 	multiparter.c = newStreamDataConsumerForMultipart(pw)
 
-	multiparter.handler = stream.NewSafeStreamHandler(
+	multiparter.handler = stream.NewSafeStreamConsumer(
 		inputStream,
 		inputErrCh,
 		multiparter.c,

@@ -9,16 +9,16 @@ type StreamDataConsumer interface {
 	Finalize()
 }
 
-type SafeStreamHandler struct {
-	stream      Stream
+type SafeStreamConsumer struct {
+	stream      *Stream
 	inputErrCh  <-chan error
 	outputErrCh chan error
 	consumer    StreamDataConsumer
 }
 
-func NewSafeStreamHandler(stream Stream, errCh <-chan error, c StreamDataConsumer) *SafeStreamHandler {
+func NewSafeStreamConsumer(stream *Stream, errCh <-chan error, c StreamDataConsumer) *SafeStreamConsumer {
 
-	sr := &SafeStreamHandler{
+	sr := &SafeStreamConsumer{
 		stream:     stream,
 		inputErrCh: errCh,
 		consumer:   c,
@@ -36,7 +36,7 @@ func NewSafeStreamHandler(stream Stream, errCh <-chan error, c StreamDataConsume
 
 }
 
-func (sr *SafeStreamHandler) StartHandling() <-chan error {
+func (sr *SafeStreamConsumer) StartHandling() <-chan error {
 
 	if sr.inputErrCh == nil || sr.outputErrCh == nil || sr.stream == nil || sr.consumer == nil {
 		panic("stream handler is not initialized")
@@ -56,7 +56,7 @@ func (sr *SafeStreamHandler) StartHandling() <-chan error {
 
 		for {
 
-			streamData, ok := <-sr.stream
+			streamData, ok := sr.stream.GetData()
 
 			if !ok {
 				break
@@ -69,7 +69,7 @@ func (sr *SafeStreamHandler) StartHandling() <-chan error {
 
 		}
 
-		if err, ok := <-sr.inputErrCh; ok && err != nil {
+		if err, ok := ReadErr(sr.inputErrCh); ok && err != nil {
 			sr.outputErrCh <- err
 		}
 
@@ -79,7 +79,7 @@ func (sr *SafeStreamHandler) StartHandling() <-chan error {
 
 }
 
-func (sr *SafeStreamHandler) safeFinalize() {
+func (sr *SafeStreamConsumer) safeFinalize() {
 
 	defer func() {
 		if r := recover(); r != nil {
